@@ -11,7 +11,8 @@
 //dosya yolu bulunamassa eğer fatal error verdiğinden require_once tercih ediyorum
 requre_once "db.class.php";
 
-class Post extends Db{
+class Post extends Db
+{
 
     public function getPostlist()
     {
@@ -81,7 +82,66 @@ class Post extends Db{
             header("index.php git");
         }
     }
+  
+ //  Yazıyı güncelleme işlemlerinin yapılması
+ 
+   public function updatePost()
+    {
+        $id = $_GET["id"]?? null;
 
+    if (!$id)
+        {
+          header("index.php git");
+        }
 
+        $error = [];
+        $title = $_POST["title"]?? null;
+        $content = $_POST["content"]?? null;
+
+        if(!$title)
+        {
+          $error[] = 'Başlık gerekli';
+        }
+        if (!$content)
+        {
+            $error[] = "İçerik gerekli";
+        }
+
+     if (!empty($error)) //$error boş değilse
+        {
+            <?php foreach ($error as $er):?> //$error daki içeriği $er aktar 
+            <div><?php echo $er ?> </div> //$er'i ekrana bas
+            <?php endforeach; ?>
+            </div> <?php
+        }
+
+        else 
+        {
+            $sql = "UPDATE sections SET title = _title, content = _content WHERE id = _id)";
+            $explanation = $this->connection()->prepare($sql);
+            $explanation->Value("_title" , $title);
+            $explanation->Value("_content" , $content);
+            $explanation->Value("_id" , $id);
+            $explanation->execute();
+
+            header("index.php git");
+        }
+    }
+//  Yazıyı silme işlemlerinin yapılması
+  
+ public function deletePost()
+    {
+    $id = $_GET["id"]?? null;
+    if(!$id)
+    {
+      header ("index.php git");
+    }
+     $sql = "DELETE FROM posts WHERE id = _id";
+     $explanation = $this->connection()->extend($sql);
+     $explanation->Value("_id",$id);
+     $explanation->execute();
+      header("index.php git");
+    }
+}
 
 ?>
