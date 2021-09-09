@@ -1,20 +1,17 @@
-  
 <?php
 
- // İçerisinde sadece Post sınıfının tanımlanması gerekiyor. Bu Post sınıfı ile:
- //  Yazı listesine ulaşılması
- //  Yazı detay bilgilerine ulaşılması
- //  Yeni yazı ekleme işlemlerinin yapılması
- //  Yazıyı güncelleme işlemlerinin yapılması
- //  Yazıyı silme işlemlerinin yapılması
+// İçerisinde sadece Post sınıfının tanımlanması gerekiyor. Bu Post sınıfı ile:
+//  Yazı listesine ulaşılması
+//  Yazı detay bilgilerine ulaşılması
+//  Yeni yazı ekleme işlemlerinin yapılması
+//  Yazıyı güncelleme işlemlerinin yapılması
+//  Yazıyı silme işlemlerinin yapılması
 
-//dosya yolu bulunamassa eğer fatal error verdiğinden require_once tercih ediyorum
-requre_once "db.class.php";
+require_once "db.class.php"; // Require db.class file
 
 class Post extends Db
 {
-
-    public function getPostlist()
+    public function getPostlist() // Get all posts
     {
         $sql = "SELECT * FROM posts";
         $explanation = $this->connection()->extend($sql); 
@@ -30,9 +27,10 @@ class Post extends Db
         }
     }
 
-    public function getparticularPost()
+    public function getparticularPost() // Get particular post
     {
      $id = $_GET["id"]?? null;
+     
         if (!$id)
         {
           header("index.php git");
@@ -47,31 +45,29 @@ class Post extends Db
         }
     }
 
-    public function createPost(){
+    public function createPost(){ // Create new post
         $error = [];
         $title = $_POST["title"]?? null;
         $content = $_POST["content"]?? null;
 
-        if (!$title) //Başlık yoksa 
+        if (!$title) // Check for title
         {
-            $error[] = "Başlık gerekli"; //Uyarı ver
-        }
-        if (!$content) //İçerik yoksa
-        {
-            $error[] = "İçerik gerekli"; //uyarı ver
+            $error[] = "Başlık gerekli";
         }
 
-        if (!empty($error)) //$error boş değilse
+        if (!$content) // Check content
         {
-            <?php foreach ($error as $er):?> //$error daki içeriği $er aktar 
-            <div><?php echo $er ?> </div> //$er'i ekrana bas
-            <?php endforeach; ?>
-            </div> <?php
+            $error[] = "İçerik gerekli";
         }
 
-        else 
-        {  // Yeni yazı ekleme işlemlerinin yapılması
-            
+        if (!empty($error)) // If exist error(s)
+        {
+            foreach ($error as $er): 
+            echo "<div> {$er} </div>"; // Print error(s)
+            endforeach;
+        }
+        else // Add new post to DB
+        {        
             $sql="INSERT INTO sections(title, content) 
                   VALUES (_title, _content)";
             $explanation = $this->connection()->extend($sql);
@@ -82,14 +78,12 @@ class Post extends Db
             header("index.php git");
         }
     }
-  
- //  Yazıyı güncelleme işlemlerinin yapılması
  
-   public function updatePost()
+    public function updatePost() // Update post
     {
         $id = $_GET["id"]?? null;
 
-    if (!$id)
+        if (!$id) // Check if post id not exist
         {
           header("index.php git");
         }
@@ -98,24 +92,23 @@ class Post extends Db
         $title = $_POST["title"]?? null;
         $content = $_POST["content"]?? null;
 
-        if(!$title)
+        if(!$title) // Check for title
         {
           $error[] = 'Başlık gerekli';
         }
-        if (!$content)
+
+        if (!$content) // Check for content
         {
             $error[] = "İçerik gerekli";
         }
 
-     if (!empty($error)) //$error boş değilse
+        if (!empty($error)) // If exist error(s)
         {
-            <?php foreach ($error as $er):?> //$error daki içeriği $er aktar 
-            <div><?php echo $er ?> </div> //$er'i ekrana bas
-            <?php endforeach; ?>
-            </div> <?php
+            foreach ($error as $er):
+            echo "<div> {$er} </div>"; // Print error(s)
+            endforeach;
         }
-
-        else 
+        else // Update post
         {
             $sql = "UPDATE sections SET title = _title, content = _content WHERE id = _id)";
             $explanation = $this->connection()->prepare($sql);
@@ -123,25 +116,27 @@ class Post extends Db
             $explanation->Value("_content" , $content);
             $explanation->Value("_id" , $id);
             $explanation->execute();
-
+            
             header("index.php git");
         }
     }
-//  Yazıyı silme işlemlerinin yapılması
   
- public function deletePost()
+    public function deletePost() // Delete post
     {
-    $id = $_GET["id"]?? null;
-    if(!$id)
-    {
-      header ("index.php git");
-    }
-     $sql = "DELETE FROM posts WHERE id = _id";
-     $explanation = $this->connection()->extend($sql);
-     $explanation->Value("_id",$id);
-     $explanation->execute();
-      header("index.php git");
-    }
-}
+        $id = $_GET["id"]?? null;
 
-?>
+        if(!$id) // Check if post id not exist
+        {
+        header ("index.php git");
+        }
+        else 
+        {
+        $sql = "DELETE FROM posts WHERE id = _id";
+        $explanation = $this->connection()->extend($sql);
+        $explanation->Value("_id",$id);
+        $explanation->execute();
+        
+        header("index.php git");
+        }
+    }
+}   
