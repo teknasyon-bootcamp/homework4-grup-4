@@ -13,21 +13,14 @@ class Post extends Db
 {
     public function getPostlist() // Get all posts
     {
-        $sql = "SELECT * FROM posts";
-        $explanation = $this->connection()->extend($sql); 
-        $explanation->execute();
-        
-    $result = $explanation->fetchAll();
-    
-        foreach ($result as $s)
-        {
-          echo $s[1] . "<br>";
-          echo $s[2] . "<br>";
-          echo $s[3] . "<br>";
+        $allPosts = $this->connect()->query("SELECT * FROM posts");
+
+        foreach($allPosts->fetchAll(PDO::FETCH_ASSOC) as $post) {
+        echo "<li> {$post["title"]} </li>";
         }
     }
 
-    public function getparticularPost() // Get particular post
+    public function getparticularPost($id = null) // Get particular post
     {
      $id = $_GET["id"]?? null;
      
@@ -35,17 +28,14 @@ class Post extends Db
         {
           header("index.php git");
         }
-          $sql = "SELECT * FROM posts WHERE id = _id";
-          $explanation = $this->connection()->extend($sql);
-          $explanation->Value("_id",$id);
-          $explanation->execute();
 
-        while($result = $explanation->fetchAll()){
-            return $result;
-        }
+        $particularPost = $this->connect()->prepare("SELECT * FROM posts WHERE id = id");
+        $particularPost->execute([$id]);
+
+        return $particularPost->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function createPost(){ // Create new post
+    public function createPost($id, $name, $content, $created_at){ // Create new post
         $error = [];
         $title = $_POST["title"]?? null;
         $content = $_POST["content"]?? null;
@@ -67,19 +57,15 @@ class Post extends Db
             endforeach;
         }
         else // Add new post to DB
-        {        
-            $sql="INSERT INTO sections(title, content) 
-                  VALUES (_title, _content)";
-            $explanation = $this->connection()->extend($sql);
-            $explanation->Value('_title',$title);
-            $explanation ->Value('_content',$content);
-            $explanation->execute();
+        {    
+            $newPost = $this->connect()->prepare("INSERT INTO posts VALUES (title, content)");    
+            $newPost->execute();
 
             header("index.php git");
         }
     }
  
-    public function updatePost() // Update post
+    public function updatePost($id, $name, $content) // Update post
     {
         $id = $_GET["id"]?? null;
 
@@ -110,13 +96,13 @@ class Post extends Db
         }
         else // Update post
         {
-            $sql = "UPDATE sections SET title = _title, content = _content WHERE id = _id)";
-            $explanation = $this->connection()->prepare($sql);
-            $explanation->Value("_title" , $title);
-            $explanation->Value("_content" , $content);
-            $explanation->Value("_id" , $id);
-            $explanation->execute();
-            
+            $updatePost = $this->connect()->prepare("UPDATE sections SET id = id, title = title, content = content WHERE id = id)");    
+            $updatePost->execute([
+                $id,
+                $name,
+                $content,
+            ]);
+
             header("index.php git");
         }
     }
@@ -131,12 +117,10 @@ class Post extends Db
         }
         else 
         {
-        $sql = "DELETE FROM posts WHERE id = _id";
-        $explanation = $this->connection()->extend($sql);
-        $explanation->Value("_id",$id);
-        $explanation->execute();
-        
-        header("index.php git");
+            $deletePost = $this->connect()->prepare("DELETE FROM posts WHERE id = _id");    
+            $deletePost->execute();
+
+            header("index.php git");
         }
     }
 }   
