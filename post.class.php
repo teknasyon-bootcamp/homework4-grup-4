@@ -13,10 +13,13 @@ class Post extends Db
 {
     public function getPostlist() // Get all posts
     {
-        $allPosts = $this->connect()->query("SELECT * FROM posts");
+        $data = $this->connect()->query("SELECT * FROM posts");
 
-        foreach($allPosts->fetchAll(PDO::FETCH_ASSOC) as $post) {
-        echo "<li> {$post["title"]} </li>";
+        foreach($data->fetchAll(PDO::FETCH_ASSOC) as $post) {
+        echo "<p> {$post["post_id"]} </p>";
+        echo "<h2> {$post["title"]} </h2>";
+        echo "<p> {$post["content"]} </p>";
+        echo "<p> {$post["created_at"]} </p>";
         }
     }
 
