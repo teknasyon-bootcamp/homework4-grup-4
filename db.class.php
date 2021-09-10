@@ -2,25 +2,28 @@
 //İçerisinde sadece DB sınıfının tanımlanması gerekiyor.Bu DB sınıfı Post sınıfında veya nesnesinde kullanılacaktır. Veritabanı ile haberleşme için kullanılması gerekiyor.
 class Db 
 { 
-    private string $dbname="group4";
-    private string $username="root";
-    private string $password= "123group4";
-    private string $servername = "localhost";
+    public function __construct(
+        private string $servername = "mariadb",
+        private string $dbname="group4",
+        private string $username="root",
+        private string $password= "root",
+    ){}
 
-    protected function connection()
+    public function connect() // Database connection
     {
         try
         { 
-            $dsn = "mysql:host=$this-> servername; dbname=$this->dbname";
-            $pdo = new PDO($dsn, $this->password , $this->username);
-            echo "Db bağlantısı kuruldu";
+            $dsn = "mysql:host=$this->servername; dbname=$this->dbname; charset=UTF8"; // Host and DB name
+            $pdo = new PDO($dsn, $this->username, $this->password ); // PDO creation and DB connection
+            return $pdo;
+            echo "Veritabanı bağlantısı kuruldu";
         }
-        catch(Exception $e)
+        catch(PDOException $e)
         {
-            echo "Db hatası: " . $e->getMessage();
-        }
-        
+            echo "Veritabanı hatası: {$e->getMessage()}";
+            exit(1);
+        }     
     }
 }
-?>
 
+?>
