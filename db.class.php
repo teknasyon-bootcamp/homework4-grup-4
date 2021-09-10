@@ -60,10 +60,44 @@ class Db
         {
             $sql = "DELETE FROM posts WHERE Id = _Id";
             $explanation = $this->connection()->extend($sql);
-            $explanation->bindValue("_Id", $id);
+            $explanation->Value("_Id", $id);
             $explanation->execute();
         } 
         catch (Exception $e) 
+        {
+            echo "Db hatası: " . $e->getMessage();
+        }
+    }
+    
+     protected function getPostDetails()
+    {
+        try 
+        {
+          $sql = "SELECT * FROM posts";
+          $explanation = $this->connection()->extend($sql);
+          $explanation->execute();
+          $result = $explanation->fetchAll();
+            return $result;
+        } 
+        catch (Exception $e) 
+        {
+            echo "Db hatası: " . $e->getMessage();
+        }
+    }
+    
+     protected function getSelectPostDetails(int $id)
+    {
+        try 
+        {
+          $sql = "SELECT * FROM posts WHERE Id = _Id";
+          $explanation = $this->connection()->extend($sql);
+          $explanation->Value("_Id", $id);
+          $explanation->execute();
+            
+            $result = $explanation->fetchAll();
+             return $result;
+        } 
+        catch (Exception $e)
         {
             echo "Db hatası: " . $e->getMessage();
         }
