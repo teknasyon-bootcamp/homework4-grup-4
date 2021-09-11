@@ -13,32 +13,22 @@ class Post extends Db
 {
     public function getPostlist() // Get all posts
     {
-        $data = $this->connect()->query("SELECT * FROM posts");
+        $sql = "SELECT * FROM posts";
+        $data = $this->connect()->query($sql);
 
-        foreach($data->fetchAll(PDO::FETCH_ASSOC) as $post) {
-        echo "<p> {$post["post_id"]} </p>";
-        echo "<h2> {$post["title"]} </h2>";
-        echo "<p> {$post["content"]} </p>";
-        echo "<p> {$post["created_at"]} </p>";
-        }
+        return $data->fetchAll(PDO::FETCH_ASSOC); 
     }
 
-    public function getparticularPost($id = null) // Get particular post
+    public function getparticularPost($post_id = null) // Get particular post
     {
-     $id = $_GET["id"]?? null;
-     
-        if (!$id)
-        {
-          header("index.php git");
-        }
+        $sql = "SELECT * FROM posts WHERE post_id = ?";
+        $data = $this->connect()->prepare($sql);
+        $data->execute([$post_id]);
 
-        $particularPost = $this->connect()->prepare("SELECT * FROM posts WHERE id = id");
-        $particularPost->execute([$id]);
-
-        return $particularPost->fetchAll(PDO::FETCH_ASSOC);
+        return $data->fetchAll(PDO::FETCH_ASSOC); 
     }
 
-    public function createPost($id, $name, $content, $created_at){ // Create new post
+    public function createPost($title, $content, $published_at){ // Create new post
         $error = [];
         $title = $_POST["title"]?? null;
         $content = $_POST["content"]?? null;
@@ -61,18 +51,18 @@ class Post extends Db
         }
         else // Add new post to DB
         {    
-            $newPost = $this->connect()->prepare("INSERT INTO posts VALUES (title, content)");    
-            $newPost->execute();
+            $sql = "INSERT INTO posts VALUES (title, content)";
+            $newPost = $this->connect()->prepare($sql);    
+            $newPost->execute([$title, $title, $content, $published_at]);
 
-            header("index.php git");
         }
     }
  
-    public function updatePost($id, $name, $content) // Update post
+    public function updatePost($post_id, $title, $content) // Update post
     {
-        $id = $_GET["id"]?? null;
+        $post_id = $_GET["post_id"]?? null;
 
-        if (!$id) // Check if post id not exist
+        if (!$post_id) // Check if post post_id not exist
         {
           header("index.php git");
         }
@@ -99,31 +89,30 @@ class Post extends Db
         }
         else // Update post
         {
-            $updatePost = $this->connect()->prepare("UPDATE sections SET id = id, title = title, content = content WHERE id = id)");    
+            $sql = $str = "UPDATE posts SET title = ?, content = ? WHERE post_id = ?";
+            $updatePost = $this->connect()->prepare($sql);    
             $updatePost->execute([
-                $id,
-                $name,
+                $title,
                 $content,
+                $post_id,
             ]);
 
-            header("index.php git");
         }
     }
   
-    public function deletePost() // Delete post
+    public function deletePost($post_id) // Delete post
     {
-        $id = $_GET["id"]?? null;
+        $post_id = $_GET["post_id"]?? null;
 
-        if(!$id) // Check if post id not exist
+        if(!$post_id) // Check if post post_id not exist
         {
         header ("index.php git");
         }
         else 
         {
-            $deletePost = $this->connect()->prepare("DELETE FROM posts WHERE id = _id");    
-            $deletePost->execute();
-
-            header("index.php git");
+            $sql = "DELETE FROM posts where post_id = ?";
+            $deletePost = $this->connect()->prepare($sql);    
+            $deletePost->execute([$post_id]);
         }
     }
 }   
