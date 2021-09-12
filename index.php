@@ -2,76 +2,44 @@
 //Veritabanında yer alan post listesi gösterilmelidir. Eğer ?post=X şeklinde bir query parametresi verildiyse ($_GET) sadece ilgili post gösterilmelidir.
 //db bağlantısı onaylandı
 require_once "post.class.php";
+$posts = new Post; // Create post object
+$post = $posts->getPostlist(); // Post object assigns a variable
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ana Sayfa</title>
+    <title>Posts</title>
 </head>
-<body>
-<h1>Select Post</h1>
-    <form method="get">
-        <label for="ID"></label>
-        <input type="text" name="post", id="selectid">
-        <button type="submit">Select Post</button>
-    </form>
-    
-
-    <h1>Post Lists</h1>
+<body>    
     <?php
-    $posts = new Post; 
-
-    if(isset($_POST["delButton"]))
-    {
-    $posts->deletePost($_POST["delID"]);
-    }
-
-    if(isset($_POST["addButton"]))
-    {
-    $posts->createPost($_POST["add-id"],$_POST["add-title"],$_POST["add-content"]);
-    }
-var_dump($_POST);
-   // List all post
-    if(!isset($_GET["post"])){  
-        $posts->getPostlist();
-    }
-    else {
-    $posts->getParticularPost($_GET["post"]); //Particular Post
-    }
-    
-    
+        if(isset($_GET["post"])): // Control $_GET global
+            $particularPost = $posts->getParticularPost($_GET["post"]);
+           
+            $particularPost = $particularPost[0];
+           // var_dump($_GET);
+            ?>
+            <a href="http://localhost/homework/homework4-grup-4/index.php"><button>Posts List</button></a> <!--Return to index.php-->
+            <div>                                           
+                <h4><?= $particularPost["title"] ?> </h4> 
+                <p><?= $particularPost["content"] ?> </p> <!--Particular Post Details-->
+            </div>
+            <?php
+            else: 
+            ?>
+<h2>Posts</h2>
+<?php
+foreach ($post as $value): ?>  <!--List All Posts-->
+<div>
+   <h3> <?= $value['id'] ?>
+   <a href="<?="http://localhost/homework/homework4-grup-4/index.php?post=".$value['id']  ?>"> <?= $value['title'] ?> </a>
+</h3> 
+</div>
+<?php endforeach; 
+endif;
 ?>
-    
-    <h1>Add Post</h1>
-    <form method="post">
-        <label for="id">ID</label>
-        <input type="text" name="add-id" id="add-id" />
-        <label for="title">Name</label>
-        <input type="text" name="add-title" id="title" />
-        
-        <label for="content">Content</label>
-        <input type="text" name="add-content" id="content">
-
-        <button name="addButton" type="submit">Add Post</button>
-    </form>
-
-
-    <h1>Delete Post</h1>
-    <form method="post">
-        <label for="id">ID</label>
-        <input type="text" name="delID" id="delID" />
-        <button name="delButton" type="submit">Delete User</button>
-    </form>
-
-    
-
 </body>
 </html>
-
-
-
 
