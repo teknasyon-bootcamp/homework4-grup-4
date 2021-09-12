@@ -1,10 +1,10 @@
 <?php
 //Veritabanında yer alan post listesi gösterilmelidir. Eğer ?post=X şeklinde bir query parametresi verildiyse ($_GET) sadece ilgili post gösterilmelidir.
 //db bağlantısı onaylandı
-    require_once "post.class.php";
+    require_once "post.class.php"; // Require post.class file
 
-    $postsData = new Post;
-    $posts = $postsData->getPostlist();
+    $postsData = new Post; // Create new Post object
+    $posts = $postsData->getPostlist(); // Get all posts
 ?>
 
 <!doctype html>
@@ -16,7 +16,8 @@
     <title>Manage | Group 4</title>
   </head>
   <body>
-    <div class="container text-center">
+      <div class="container text-center">
+
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
                 <a class="navbar-brand p-2 text-primary fs-3 fw-bold" href="<?php echo "index.php" ?>">Group4</a>
@@ -32,87 +33,89 @@
                 </div>
             </div>
         </nav>
-        
+
     <?php    
-        if(isset($_GET['action'])) {
-
+        if(isset($_GET['action'])) { // If there is some action on post(s)
             switch($_GET['action']) {
-                case 'create':                    
+                case 'create': // if action is create               
                     echo '<h5 class="bg-primary text-light p-3 ">Create Post</h5>' ?>
-
                     <hr>
                     <form id="newPostForm" class="d-grid gap-2 col-6 mx-auto my-5" action="manage.php?action=store" method="post">
-                    <div class="mb-3">
-                        <input class="form-control" id="title" type="text" placeholder="Title" name="title"/>
-                    </div>
-                    <div class="mb-3">
-                         <textarea class="form-control" id="content" type="text" placeholder="Content" name="content" style="height: 10rem;"></textarea>
-                    </div>
-                    <div class="d-grid">
-                        <button class="btn btn-primary btn-lg" type="submit" name="new" >Store</button>
-                    </div>
-                </form>
+                        <div class="mb-3">
+                            <input class="form-control" id="title" type="text" placeholder="Title" name="title"/>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="content" type="text" placeholder="Content" name="content" style="height: 10rem;"></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-primary btn-lg" type="submit" name="new" >Store</button>
+                        </div>
+                    </form>
 
                 <?php 
                 break; 
                 
-                case 'store':
-                    $title = $_POST['title'];
-                    $content = $_POST['content'];
-                    $postsData->createPost($title, $content);
+                case 'store': // if action is store 
+                    $title = $_POST['title']; // Get title
+                    $content = $_POST['content']; // Get content
+                    $postsData->createPost($title, $content); // Create new post at DB
 
-                    header('Location: manage.php');  
+                    header('Location: manage.php'); // Redirect to manage.php page 
                 break;
 
-                case 'edit':
-                    $singlePost = (int) $_GET['postId'];
-                    $postId = $postsData->getSinglePost($singlePost);
-                    $postId = $postId[0];
-
+                case 'edit': // If action is edit
+                    $singlePost = (int) $_GET['postId']; // Get current post ID
+                    $post = $postsData->getSinglePost($singlePost); // Get current post from DB
+                    $post = $post[0]; // Current post
+                    
+                    // Show post header and edit post form
                     echo '<h5 class="bg-primary text-light p-3 ">Update Post</h5>'; ?>
 
                     <hr>
                     <form id="updatePostForm" class="d-grid gap-2 col-6 mx-auto my-5" action="manage.php?action=update&postId=<?php echo $singlePost ?>" method="post">
                         <div class="mb-3">
-                            <input class="form-control" id="post_id" type="text" placeholder="Post ID" name="postId" value="<?php echo $postId['post_id'] ?>"/>
+                            <input class="form-control" id="post_id" type="text" placeholder="Post ID" readonly name="postId" value="<?php echo $post['post_id'] ?>"/>
                         </div>
                         <div class="mb-3">
-                            <input class="form-control" id="title" type="text" placeholder="Title" name="title" value="<?php echo $postId['title'] ?>"/>
+                            <input class="form-control" id="title" type="text" placeholder="Title" name="title" value="<?php echo $post['title'] ?>"/>
                         </div>
                         <div class="mb-3">
-                            <textarea class="form-control" id="content" type="text" placeholder="Content" name="content" style="height: 10rem;"><?php echo $postId['content'] ?></textarea>
+                            <textarea class="form-control" id="content" type="text" placeholder="Content" name="content" style="height: 10rem;"><?php echo $post['content'] ?></textarea>
                         </div>
                             <div class="d-grid">
                             <button class="btn btn-primary text-light btn-lg" type="submit" name="update" >Save</button>
                         </div>
                     </form>
+
                 <?php 
                 break; 
                 
-                case 'delete':
-                    $postId = (int) $_GET['postId'];
-                    $postsData->deletePost($postId);
+                case 'delete': // If action is delete
+                    $postId = (int) $_GET['postId']; // Get current post ID
+                    $postsData->deletePost($postId); // Delete post from DB
 
-                    header('Location: manage.php');  
+                    header('Location: manage.php'); // Redirect to manage.php page 
                 break;
 
-                case 'update':
-                    $postId = (int) $_POST['postId'];
-                    $title = $_POST['title'];
-                    $content = $_POST['content'];
-                    $postsData->updatePost($title, $content, $postId);
+                case 'update': // If action is update
+                    $postId = (int) $_POST['postId']; // Get current post ID
+                    $title = $_POST['title']; // Get post title
+                    $content = $_POST['content']; // Get post content
+                    $postsData->updatePost($title, $content, $postId); // Update post at DB
                 break;
 
-                default:
-                    return header('Location: manage.php');
+                default: //f action method not match with existings
+                    return header('Location: manage.php'); // Redirect to manage.php page
                 break;
             }
-        } else { ?>
+        // If there no action on post(s), show all posts 
+        } else { ?> 
+
             <div class="d-grid gap-2 col-6 mx-auto my-5">
                 <a class="btn btn-primary" type="button" href="manage.php?action=create">Add New Post</a>
             </div>
 
-           <?php foreach ($posts as $post): ?>    
+            <?php foreach ($posts as $post): ?> 
 
             <div class="card text-center mt-5">
                 <div class="card-header">
@@ -123,20 +126,23 @@
                     <p class="card-text"> <?php echo $post['content'] ?></p>
                 </div>
                 <div class="card-footer text-muted">
-                    <div><p>Published at <i><?php echo $post['published_at'] ?></i></p></div>
+                    <div>
+                        <p>Published at <i><?php echo $post['published_at'] ?></i></p>
+                    </div> 
                     
                     <div>
                         <ul class="nav nav-pills d-md-flex justify-content-center">
-                        <li class="nav-item"> 
-                            <a class="nav-link" href="<?php echo $_SERVER['PHP_SELF'] . "?action=edit&postId=" . $post['post_id'] ?>">Edit</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="<?php echo $_SERVER['PHP_SELF'] . "?action=delete&postId=" . $post['post_id'] ?>">Delete</a>
-                        </li>
-                    </ul> 
+                            <li class="nav-item"> 
+                                <a class="nav-link" href="<?php echo $_SERVER['PHP_SELF'] . "?action=edit&postId=" . $post['post_id'] ?>">Edit</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?php echo $_SERVER['PHP_SELF'] . "?action=delete&postId=" . $post['post_id'] ?>">Delete</a>
+                            </li>
+                        </ul> 
                     </div>
                 </div>
             </div>
+
         <?php endforeach; 
         } ?>
 

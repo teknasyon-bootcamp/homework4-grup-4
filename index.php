@@ -2,10 +2,10 @@
 //Veritabanında yer alan post listesi gösterilmelidir. Eğer ?post=X şeklinde bir query parametresi verildiyse ($_GET) sadece ilgili post gösterilmelidir.
 //db bağlantısı onaylandı
 
-    require_once "post.class.php";
+    require_once "post.class.php"; // Require post.class file
 
-    $postsObj = new Post;
-    $posts = $postsObj->getPostlist();
+    $postsObj = new Post; // Create new Post object
+    $posts = $postsObj->getPostlist(); // Get all posts
 ?>
 
 <!doctype html>
@@ -18,6 +18,7 @@
   </head>
   <body>
     <div class="container text-center">
+
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
                 <a class="navbar-brand p-2 text-primary fs-3 fw-bold" href="<?php echo $_SERVER['PHP_SELF']?>">Group4</a>
@@ -38,13 +39,12 @@
         </nav>
 
     <?php
-
-        if(isset($_GET['postId'])):
+        if(isset($_GET['postId'])): // Get selected post and show
             $singlePost = $_GET['postId'];
             $postId = $postsObj->getSinglePost($singlePost);
             $postId = $postId[0];
     ?>
-    
+
         <div class="card text-center mt-5">
             <div class="card-header">
                 <?php echo $postId['post_id'] ?>
@@ -59,28 +59,27 @@
         </div>
 
     <?php
-        else:
-            $postId = "";
-    ?>
+    else:
+        $postId = "";
 
-    <?php foreach ($posts as $post): ?>
-        
-        <div class="card text-center mt-5">
-            <div class="card-header">
-                <?php echo $post['post_id'] ?>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title"> <?php echo $post['title'] ?></h5>
-                <p class="card-text"> <?php echo $post['content'] ?></p>
-                <a href="<?php echo $_SERVER['PHP_SELF'] . "?postId=" . $post['post_id'] ?>" class="btn btn-primary">Details</a>
-            </div>
-            <div class="card-footer text-muted">
-                Published at <i><?php echo $post['published_at'] ?></i>
-            </div>
-        </div>
+        // Show all posts        
+        foreach ($posts as $post): ?>
 
-    <?php endforeach; ?>
+            <div class="card text-center mt-5">
+                <div class="card-header">
+                    <?php echo $post['post_id'] ?>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title"> <?php echo $post['title'] ?></h5>
+                    <p class="card-text"> <?php echo $post['content'] ?></p>
+                    <a href="<?php echo $_SERVER['PHP_SELF'] . "?postId=" . $post['post_id'] ?>" class="btn btn-primary">Details</a>
+                </div>
+                <div class="card-footer text-muted">
+                    Published at <i><?php echo $post['published_at'] ?></i>
+                </div>
+            </div>
 
+        <?php endforeach; ?>
     <?php endif; ?>
 
     </div>
