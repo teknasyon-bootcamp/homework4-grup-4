@@ -7,145 +7,66 @@
 //  Yazıyı güncelleme işlemlerinin yapılması
 //  Yazıyı silme işlemlerinin yapılması
 
-require_once "db.class.php"; // Require db.class file
+require_once "db.class.php"; 
 
 class Post extends Db
 {
-    public function getPostlist() // Get all posts
-    {   $sqlcommand = "SELECT *FROM posts";
-        $allPosts = $this->connect()->query($sqlcommand);
+    
+  public function getPostlist() // Get all posts
+  { try{ 
+    $sqlcommand = "SELECT * FROM posts";               //SQL command prepare
+    $statement = $this->connect()->query($sqlcommand); // Database connection and send command
+    return $statement->fetchAll(PDO::FETCH_ASSOC);     // Return all post details 
+    }catch(Exception $e){
+    echo "Database error:" . $e->getMessage();
+  }
+  }                     
 
-        foreach($allPosts->fetchAll(PDO::FETCH_ASSOC) as $post) {
-        echo "<div><h1>{$post["title"]}</h1>
-        {$post["content"]}</div>";
-        
-        }
-    }
+  public function getParticularPost($id=null) // Get particular post
+  { 
+    try{
+    $sqlcommand = "SELECT * FROM posts WHERE id = ?";    // SQL command prepare
+    $statement = $this->connect()->prepare($sqlcommand); // Database connection and prepare command 
+    $statement->execute([$id]);                          // Send command
+    return $statement->fetchAll(PDO::FETCH_ASSOC);       // Return single post detail
+    }catch(Exception $e){
+    echo "Database error:" . $e->getMessage();
+  }
+  }
 
-    public function getParticularPost(int $id) // Get particular post
-    {
-    // $id = $_GET["post"]?? null;
-     
-      //  if (!$id)
-      // {
-      //    header("index.php git");
-      // }
-      //   else{
-            $sqlcommand = "SELECT * FROM posts WHERE id = :id";
-            $statement = $this->connect()->prepare($sqlcommand);
-            $statement->bindValue(":id",$id);
-            $statement->execute();
-            $particularPost = $statement->fetchAll(PDO::FETCH_ASSOC);
-          //  var_dump($result);
-        //  if(!is_int($particularPost["id"])) {
-        //    echo "<h1>Posta erişilemedi </h1>";
-        //}
-        
-            foreach($particularPost as $post )
-            echo "<div><h1>{$post["title"]}</h1>
-            {$post["content"]}</div>";
-           
-         //  if(empty($result[0])){
-         //       return 0;
-         //   }
-        //    return $result;
-      //  $particularPost = $this->connect()->query("SELECT * FROM posts WHERE id = :id");
-       // $particularPost->execute([$id]);
-      //  }
-      //  return $particularPost->fetchAll(PDO::FETCH_ASSOC);
-    }
+  public function createPost( int $id, string $title, string $content) // Create new post
+  { 
+    try{
+    $sqlcommand = "INSERT INTO posts (id,title,content) VALUES (:id,:title,:content)"; //SQL command prepare
+    $statement = $this->connect()->prepare($sqlcommand);                               // Database connection and prepare command 
+    return $statement->execute([":id"=>$id,":title"=>$title,":content"=>$content]);    // Bind key to variable 
+    }catch(Exception $e){
+    echo "Database error:" . $e->getMessage();
+  }
+  }
 
-    public function createPost(int $id, string $title, string $content){ // Create new post
-      //  $error = [];
-      //  $title = $_POST["title"]?? null;
-      //  $content = $_POST["content"]?? null;
-
-      //  if (!$title) // Check for title
-      //  {
-      //      $error[] = "Başlık gerekli";
-      //  }
-
-      //  if (!$content) // Check content
-      //  {
-     //       $error[] = "İçerik gerekli";
-     //   }
-
-      //  if (!empty($error)) // If exist error(s)
-      //  {
-      //      foreach ($error as $er): 
-     //       echo "<div> {$er} </div>"; // Print error(s)
-      //      endforeach;
-      //  }
-      //  else // Add new post to DB
-     //  {   //ADD NEW POST
-            $sqlcommand = "INSERT INTO posts (id,title,content) VALUES (:id,:title,:content)"; 
-            $statement = $this->connect()->prepare($sqlcommand);
-            $statement->bindValue(":id",$id);
-            $statement->bindValue(":title",$title);
-            $statement->bindValue(":content",$content);    
-            $statement->execute();
-
-      //      header("index.php git");
-     //   }
-    }
- 
-    public function updatePost($id, $name, $content) // Update post
-    {
-        $id = $_GET["id"]?? null;
-
-        if (!$id) // Check if post id not exist
-        {
-          header("index.php git");
-        }
-
-        $error = [];
-        $title = $_POST["title"]?? null;
-        $content = $_POST["content"]?? null;
-
-        if(!$title) // Check for title
-        {
-          $error[] = 'Başlık gerekli';
-        }
-
-        if (!$content) // Check for content
-        {
-            $error[] = "İçerik gerekli";
-        }
-
-        if (!empty($error)) // If exist error(s)
-        {
-            foreach ($error as $er):
-            echo "<div> {$er} </div>"; // Print error(s)
-            endforeach;
-        }
-        else // Update post
-        {
-            $updatePost = $this->connect()->prepare("UPDATE sections SET id = id, title = title, content = content WHERE id = id)");    
-            $updatePost->execute([
-                $id,
-                $name,
-                $content,
-            ]);
-
-            header("index.php git");
-        }
-    }
-  
-    public function deletePost($id) // Delete post
-    {    $sqlcommand = "DELETE FROM posts WHERE id= :id";
-      //  $id = $_GET["id"]?? null;
-
-      //  if(!$id) // Check if post id not exist
-      //  {
-      //  header ("index.php git");
-      //  }
-      //  else 
-      //  {
-            $statement = $this->connect()->prepare($sqlcommand);
-            $statement->bindValue(":id",$id);    
-            $statement->execute();
-
-         //   header("index.php git");
-     //   }
-    }
+  public function deletePost($id) // Delete post
+  {  
+    try{
+    $sqlcommand = "DELETE FROM posts WHERE id= ?";       //SQL command prepare
+    $statement = $this->connect()->prepare($sqlcommand); // Database connection and prepare command  
+    $statement->execute([$id]);                          // Send command
+    }catch(Exception $e){
+      echo "Database error" . $e->getMessage();
+    }  
+  }
+  public function updatePost($id, $title, $content) // Update post
+  {
+    try{
+    $sqlcommand = "UPDATE posts SET title=:title , content=:content WHERE id=:id "; //SQL command prepare
+    $statement = $this->connect()->prepare($sqlcommand);                            // Database connection and prepare command 
+    $statement->execute([                                                           // Send command
+      ":title"=>$title,                                                             // Bind key to variable 
+      ":content"=>$content,
+      ":id"=>$id,
+      ]);
+    }catch(Exception $e){
+      echo "Database error" . $e->getMessage();
+    }         
+  }   
 }   
