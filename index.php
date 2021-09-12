@@ -40,8 +40,8 @@
     <?php
 
         if(isset($_GET['postId'])):
-            $particularPost = $_GET['postId'];
-            $postId = $postsObj->getparticularPost($particularPost);
+            $singlePost = $_GET['postId'];
+            $postId = $postsObj->getSinglePost($singlePost);
             $postId = $postId[0];
     ?>
     
