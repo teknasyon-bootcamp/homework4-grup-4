@@ -11,17 +11,16 @@ class Db
 
     protected function connect() // Database connection
     {
-        try
+        try 
         { 
             $dsn = "mysql:host=$this->servername; dbname=$this->dbname; charset=UTF8"; // Host and DB name
             $pdo = new PDO($dsn, $this->username, $this->password ); // PDO creation and DB connection
             return $pdo;
-            echo "Veritabanı bağlantısı kuruldu";
         }
-        catch(PDOException $e)
+        catch(PDOException $e) // If connect fail
         {
-            echo "Veritabanı hatası: {$e->getMessage()}";
-            exit(1);
+            echo "Database error: {$e->getMessage()}"; // Show error message
+            exit(1); 
         }     
     }
         protected function addPost(string $title, string $content)
