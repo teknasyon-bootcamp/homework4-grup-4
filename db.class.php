@@ -16,11 +16,10 @@ class Db
             $dsn = "mysql:host=$this->servername; dbname=$this->dbname; charset=UTF8"; // Host and DB name
             $pdo = new PDO($dsn, $this->username, $this->password ); // PDO creation and DB connection
             return $pdo;
-            echo "Veritabanı bağlantısı kuruldu";
         }
         catch(PDOException $e)
         {
-            echo "Veritabanı hatası: {$e->getMessage()}";
+            echo "Database error: {$e->getMessage()}";
             exit(1);
         }     
     }
