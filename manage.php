@@ -2,76 +2,92 @@
 //Veritabanında yer alan post listesi gösterilmelidir. Eğer ?post=X şeklinde bir query parametresi verildiyse ($_GET) sadece ilgili post gösterilmelidir.
 //db bağlantısı onaylandı
 require_once "post.class.php";
-?>
+$posts = new Post; // Create post object
+$post=$posts->getPostlist(); // Post object assigns a variable
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ana Sayfa</title>
-</head>
-<body>
-   <!-- 
-<h1>Select Post</h1>
-    <form method="get">
-        <label for="ID"></label>
-        <input type="text" name="post", id="selectid">
-        <button type="submit">Select Post</button>
-    </form>
--->
 
-    <h1>Post Lists</h1>
-    <?php
-    $posts = new Post; 
+echo "<a href='?action=create'><button type='button'>Add New Post</button></button></a>";  // Add post button
+if (isset($_GET["action"])){  // Form action controls
+  switch($_GET["action"]){
+  case "edit": // Edit Section
+    $postid=(int) $_GET["post"];
+    $id=$post[$postid]["id"];
+    $title=$post[$postid]["title"];
+    $content=$post[$postid]["content"]; 
+    echo "<a href='manage.php'><button type='button'>Post List</button></button></a>"; 
+    echo "<form action='manage.php?action=update' method='POST'>
+    <div>
+    <div>
+      <label>Title</label>
+      <input type='text'  name='title' value='$title' required>
+    </div>
+    <div>
+      <label>Content</label>
+      <textarea name='content' rows='10' required>$content</textarea>
+    </div>
+    <input type='hidden' name='id' value='$id'>
+    <div>
+    <button type='submit'>Update Post</button></div>
+    </div>
+    </form>";
+    break;
 
-    if(isset($_POST["delButton"]))
-    {
-    $posts->deletePost($_POST["delID"]);
-    }
-
-    if(isset($_POST["addButton"]))
-    {
-    $posts->createPost($_POST["add-id"],$_POST["add-title"],$_POST["add-content"]);
-    }
-var_dump($_POST);
-   // List all post
-    if(!isset($_GET["post"])){  
-        $posts->getPostlist();
-    }
-    else {
-    $posts->getParticularPost($_GET["post"]); //Particular Post
-    }
-?>
-    <h1>Create Post</h1>
-    <form action="manage.php?create" method="post">
-        <label for="id">ID</label>
-        <input type="text" name="add-id" id="add-id">
-        <label for="title">Name</label>
-        <input type="text" name="add-title" id="title" />
-        
-        <label for="content">Content</label>
-        <input type="text" name="add-content" id="content">
-
-        <button name="addButton" type="submit">Add Post</button>
-    </form>
+    case "create": //Create Post Section
+    echo "<a href='manage.php'><button type='button'>Post List</button></button></a>";
+    echo "<form action= 'manage.php?action=store' method='POST'>
+    <div>
+    <div >
+      <label>ID</label><br>
+      <input type='text' name='id' required>
+      <label>Title</label>
+      <input type='text' name='title' required>
+    </div>
+    <div>
+      <label >Content</label>
+      <textarea  name='content' rows='10' required></textarea>
+    </div>
+    <div><button type='submit' >Creat New Post</button></div>
+    </div>
+    </form>";
+    break;
     
-
-    <h1>Delete Post</h1>
-    <form method="post">
-        <label for="id">ID</label>
-        <input type="text" name="delID" id="delID" />
-        <button name="delButton" type="submit">Delete User</button>
-    </form>
-
     
-    <form action="manage.php?create">
-        <button type=></button>
-    </form>
-</body>
-</html>
-
-
-
-
+    break;
+    case "delete"; //Delete section
+        $postid=(int) $_GET["post"];  // Delete post according to post id action=delete  
+        $posts->deletePost($postid);
+        return header('Location: manage.php');
+    break;   
+    case "store"; 
+        $posts->createPost($_POST["id"],$_POST["title"],$_POST["content"]); // Store post according to action=create 
+        return header('Location: manage.php');
+    
+    case "update";
+        $postid=(int) $_POST["id"];
+        $posts->updatePost($postid,$_POST["title"],$_POST["content"]);     // Edit post according to value of edit section 
+        return header('Location: manage.php');
+        break;
+        default:
+            return header('Location: manage.php');  // If there is not action return manage.php
+  };
+}
+else{
+  // If there is not action, show post list    
+ foreach ($post as $id => $post) { 
+     echo"                       
+<div >
+    <table border=1>
+     <tbody>
+        <tr>
+          <td>$post[id]</td>  
+          <td>$post[title]</td>
+          <td>
+            <a href='?action=edit&post=$id'><button type='button'>Edit</button></a>  
+            <a href='manage.php?action=delete&post=$post[id]'><button type='button'>Delete</button></a>
+          </td>
+        </tr>
+     </tbody>
+    </table>
+</div>";
+}
+}
